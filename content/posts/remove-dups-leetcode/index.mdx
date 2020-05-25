@@ -1,0 +1,183 @@
+---
+title: "Remove Duplicates From Sorted List I and II (in Go)"
+date: 2020-05-23
+slug: "/remove-dups-LeetCode"
+---
+
+### A couple of solutions for LeetCode 'Remove Duplicates from Sorted List I and II'
+
+<br/>
+
+#### Remove Duplicates from Sorted List I 
+
+Problem : "Given a sorted linked list, delete all duplicates such that each element appears only once."
+
+This one is relatively easy if you understand single linked lists. The LeetCode problem page gives
+you solutions. I'll show mine here but its nothing special. Just keep a previous pointer and 
+a current pointer and skip over any node where value of previous == value of current
+
+````go
+func deleteDuplicates(head *ListNode) *ListNode {
+	var prev *ListNode
+	var node *ListNode
+	prev = head
+	node = prev.Next
+	for node != nil {
+		if node.Val == prev.Val {
+			// delete node
+			prev.Next = node.Next
+		} else {
+			prev = node
+		}
+		node = node.Next
+	}
+	return head
+}
+````
+
+<br/>
+
+#### Remove Duplicates from Sorted List II 
+
+Problem : "Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list."
+This one is rated 'medium'.
+
+There are plenty of solutions on the web for this one as well, however most of them are 'golfing', which 
+if you don't already know means solving in the minimum lines of code. That's a legit approach especially
+for interviews. For production code I prefer solutions
+that are easier to understand, possibly at the expense of additional O(?) complexity  As long as the complexity 
+is acceptable and it isn't (ON^2) or worse. Before you downvote me for that, keep in mind that there are 
+algorithms for Mininum Spanning Tree that are better than Prim's or Kruskal's, with [O(inverse-Ackermann) time.
+](https://www.cs.princeton.edu/~chazelle/pubs/mst.pdf)
+
+In the usual solutions for this problem, there are some tricky compound logical expressions 
+and sort-of complicated link dereferencing. In their favor, they are O(N) time and O(1) space (besides the linked list itself).
+My solution is O(N) time but O(N) space. But I contend its a lot easier to understand.
+
+In my solution, rather than trying to figure out the complicated linking and if'ing, I do this:
+Go through the list once and just record the duplicates in a set. Then on a second pass
+check each node to see if its in the set, and if so, skip over it. Otherwise just move to next node. This
+also has the advantage that it doesn't require sorted input. 
+
+In the LeetCode environment this ran just as fast as the conventional solutions, at  least to resolution
+of the LeetCode timing. I find that when using Go, and a fast solution, you can get 0ms or 4ms depending
+on when you submit. 
+
+If I produced this in an interview I and got pushback I would argue 'its easier to understand'. That might
+not fly unless I was able to show the O(1) space version as well. But at least I would have made my point
+on the way out the door.
+
+````go
+
+// O(N) time, O(N) memory
+func deleteDuplicates2(head *ListNode) *ListNode {
+	var m map[int]bool
+	var node *ListNode
+	var prev *ListNode
+
+	if head == nil {
+		return nil
+	}
+
+	// ============================================
+	// pass one find duplicates and map them
+	// ============================================
+	m = make(map[int]bool)
+	prev = head
+	node = prev.Next
+	for node != nil {
+		if node.Val == prev.Val {
+			// record the duplicate
+			m[node.Val] = true
+		}
+		prev = node
+		node = node.Next
+	}
+
+	// ============================================
+	// pass 2 remove nodes where Val is in the map
+	// ============================================
+	// dup in head is a special case, skip over dups
+	for head != nil {
+		_, inmap := m[head.Val]
+		if inmap {
+			head = head.Next
+		} else {
+			break
+		}
+	}
+
+	// might be empty
+	if head == nil {
+		return nil
+	}
+
+	// head is not a dup, so continue
+	prev = head
+	node = prev.Next
+	for node != nil {
+		_, inmap := m[node.Val]
+		if inmap {
+			// skip over this node
+			node = node.Next
+			prev.Next = node
+		} else {
+			// just advance to next node
+			prev = node
+			node = node.Next
+		}
+	}
+	return head
+}
+
+````
+
+
+Here's my Go test fixture if anyone cares (I doubt it). 
+I have some utilities for working with LeetCode lists.
+
+````go
+func TestRemSort2(T *testing.T) {
+	var list *singleLinkedList
+	var head *ListNode
+
+	// I have a utility that builds a list from an array spec
+	// for use with LeetCode lists
+	list = buildList([]int{1, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5})
+	head = list.head
+	head = deleteDuplicates2(head)
+	fmt.Print("should be [1] : ")
+	printList(head)
+	// i checked by printing and check
+
+	list = buildList([]int{1, 2, 3, 3, 4, 4, 5})
+	head = list.head
+	head = deleteDuplicates2(head)
+	fmt.Print("should be [1,2,5] :")
+	printList(head)
+
+	list = buildList([]int{1, 1, 2, 3, 3, 4, 4, 5})
+	head = list.head
+	head = deleteDuplicates2(head)
+	fmt.Print("should be [2,5] : ")
+	printList(head)
+
+	list = buildList([]int{})
+	head = list.head
+	head = deleteDuplicates2(head)
+	fmt.Print("should be nil : ")
+	printList(head)
+
+	list = buildList([]int{1})
+	head = list.head
+	head = deleteDuplicates2(head)
+	fmt.Print("should be [1] : ")
+	printList(head)
+
+	list = buildList([]int{1, 1})
+	head = list.head
+	head = deleteDuplicates2(head)
+	fmt.Print("should be nil : ")
+	printList(head)
+}
+````

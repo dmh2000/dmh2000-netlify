@@ -1,0 +1,14 @@
+modulo-cons for go
+flying after 25 years
+everything is a state machine (go)
+robins nest babies
+
+
+baseball
+    retrosheet.org
+    The information used here was obtained free of
+     charge from and is copyrighted by Retrosheet.  Interested
+     parties may contact Retrosheet at "www.retrosheet.org".
+
+
+use bytes not strings
