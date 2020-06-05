@@ -1,0 +1,58 @@
+---
+title: 'Missing the Point : Ternary, Map, Reduce, Filter are Expressions'
+date: 2020-06-04
+slug: '/expressions'
+---
+
+### Expressions not Statements
+
+There is a lot of discussion about why Go doesn't have the ternary operator
+nor the functional forms like Map, Reduce and Filter. Many of the advocates
+point to the conciseness of those forms. I think that is missing the point.
+**_The value of ternary and the functional forms is because they are expressions
+rather than statements._**
+
+An expression is a combination of variables and operators that result in a value.
+Expressions can be on the right-hand side of an assignment statement, for example.
+Expressions can be composed into more complex expressions but they always result
+in a value.
+
+In this context Statements perform an action. Statements can be combined into
+procedures. In some languages all statements are also expressions but not in Go.
+In Go statements are things like if, switch, for etc. By themselves they do not
+result in a value.
+
+#### Ternary
+
+The value of a ternary expression (in C,C++, Java etc) is that it returns a value, and secondarily is a clever shorthand. In Go the idiom is to use an IF statement with an else clause and a variable to hold the result. That is not composable. A ternary expression is. That said, ternary expression
+syntax becomes cumbersome enough that using it in expression composition can get ugly fast.
+So the argument that it is really just a shorthand has some merit. At least it should be
+used wisely, where you need a value, not a procedure.
+
+#### Functional Idioms
+
+In the languages that have them, functional idioms like map, reduce and filter are also expressions, not statements. Because they are expressions, they can be used in contexts
+where a procedural IF is awkward or impossible. Because they are expressions, they can be
+composed. For example, you can map -> filter -> reduce in a single expression that would
+require many lines of procedural statements. So what? Its can be a lot easier to reason about
+an expression rather than lines of procedure. Well, usually. Of course a one-liner expressions
+with many values and operators can be hard to read too.
+
+Map,reduce etc also avoid mutation. A proper implementation of map returns a new
+array. Reduce returns a single value. The original data is not modified and can be const
+if the language supports that. Its pretty widely thought that avoiding mutation
+where possible results in code that easier to reason about and avoids bugs. That is
+the argument anyway. The counter argument is that it results in a loss of performance.
+
+Its not difficult to implement these idioms for specific types if one wants to avoid
+a loop in their code, but as I understand it, without generics its impossible to implement these idioms and retain compile time type safety. The Go implementers have been pretty explicit that they do not want to add these features natively in the language. That seems to be both a simple preference and because it doesn't fit the language as designed. The verdict is still out on generics, which would at least enable library implementations.
+
+### But...
+
+All that said, Go is not a functional language, it is specifically designed to be procedural with
+a relatively simple syntax (compared to its ancestors). The tools rely on that to perform the best optimizations for that style of programming. Whether that matters is a major point that would lead to adoption of Go or a different language. That and Go's unique support for light weight multi-threading are probably the most important deciders.
+
+### Aside
+
+I really like Dart and Flutter for developing mobile apps. And Go for writing simple procedural
+programs with CSP. The design of Dart is a polar opposite of Go. I wonder how that plays out inside Google?
