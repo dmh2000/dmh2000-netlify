@@ -1,0 +1,61 @@
+---
+title: 'Is Passing a pointer "by reference?"'
+date: 2020-08-08
+slug: '/byref'
+---
+
+### Pointers and By reference
+
+There is a bit of disagreement as to what is meant by pass-by-reference.
+Does C have pass-by-reference? Some say yes, some say no. Is passing
+a pointer to a function pass-by-reference? Some say yes, some say no.
+
+The distinction revolves around the semantics of what
+pass-by-reference means. There are really two different definitions
+depending on who you ask.
+
+pass-by-value is more straightforward. Whatever argument you are passing is copied
+into the called function. Modifications to the argument within the function
+are not seen by the caller.
+
+Here's a scenario:
+You have a very large data structure or object. You want to call a function
+that modifies the object in a way that when the function returns the caller
+sees the modifications. You have two options:
+
+1. pass-by-value, so the whole object is copied, and have the function return the modified object.
+
+- non-functionals would say 'yuck, not efficient'.
+
+2. pass by reference, so the function gets a 'reference', whatever that is, to the object, makes the mods and just returns
+
+- the functional folks say 'yuck, side effect'.
+
+1. Reference Types
+
+Some folks contend that unless your language has explicit reference types,
+like C++ &name, or defaults to pass by reference (FORTRAN), then your language does not support pass by reference.
+You don't see pointers because the compiler hides the mechanism. The argument in the function has the same memory
+address as the caller does. (that's the key detail for this definition)
+
+This definition is the pedantic one. It relies on the technicalities of what actual happens. This is probably
+a more modern interpretation (even though FORTRAN). It matters a lot if you are designing a language or
+implementing a compiler that implements it.
+
+2. Pointer Types
+   A broader definition is when a pointer to the object is passed.
+
+   The function accesses the object via the pointer and
+   upon returning the caller sees any modifications. Technically, the pointer is passed by value. It is copied into
+   the function argument and resides in a different memory location than the one used by the caller. Both pointers
+   refer to the same object. On most languages that do this there will be a special syntax for creating and dereferencing a pointer.
+
+   This definition is the looser one. It relies on the concept of what is happening and less on the technical details.
+   Older references might call this pass by reference.
+
+### Conclusion
+
+If you google for pass-by-reference, you will see both definitions, and it is probably best to understand
+both sides of the argument. Especially the technical detail that in 'real' pass-by-reference the caller
+and callee have the same address of the argument. Whereas in 'simulated' pass-by-reference with pointers
+they have different addresses for the argument (but same address of the underlying block).
